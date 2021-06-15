@@ -334,13 +334,29 @@ final class NodeTypeResolver
     }
     private function isMatchingUnionType(\PHPStan\Type\Type $resolvedType, \PHPStan\Type\ObjectType $requiredObjectType) : bool
     {
-        $type = \PHPStan\Type\TypeCombinator::removeNull($resolvedType);
-        // for falsy nullables
-        $type = \PHPStan\Type\TypeCombinator::remove($type, new \PHPStan\Type\Constant\ConstantBooleanType(\false));
-        if (!$type instanceof \PHPStan\Type\ObjectType) {
-            return \false;
+        if (! $resolvedType instanceof UnionType) {
+            return false;
         }
-        return $type->isInstanceOf($requiredObjectType->getClassName())->yes();
+
+        foreach ($resolvedType->getTypes() as $unionedType) {
+            if ($unionedType instanceof TypeWithClassName && is_a(
+                    $unionedType->getClassName(),
+                    $requiredObjectType->getClassName(),
+                    true
+                )) {
+                return true;
+            }
+
+            if (! $unionedType->equals($requiredObjectType)) {
+                continue;
+            }
+
+            if ($unionedType->equals($requiredObjectType)) {
+                return true;
+            }
+        }
+
+        return false;
     }
     private function resolveArrayType(\PhpParser\Node\Expr $expr) : \PHPStan\Type\Type
     {
