@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+use Rector\Core\Configuration\Option;
+use Rector\OxidEsales\Rector\UpdateToV7UnderscoredMethodsRector;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+
+/**
+ * rector.php for running UpdateToV7UnderscoredMethodsRector on OxidEsales code.
+ * Rector removes a deprecation from PHPDoc and collects a list of deprecated methods
+ * (e.g. protected function _executeNewAction($sNewAction))
+ * to the file before running RenameMethodRector.
+ * Can be used only before updating to OxidEsales v7
+ */
+return static function (ContainerConfigurator $containerConfigurator): void {
+    $outputFile = __DIR__ . '/oxid_v7_deprecated_underscored_classes_methods.csv';
+
+    $parameters = $containerConfigurator->parameters();
+    $services = $containerConfigurator->services();
+
+    $parameters->set(
+        Option::PATHS,
+        [
+            __DIR__ . '/source/',
+            __DIR__ . '/vendor/oxid-esales/oxideshop-ee/',
+            __DIR__ . '/vendor/oxid-esales/oxideshop-pe/',
+        ]
+    )
+        ->set(
+            Option::SKIP,
+            [
+                __DIR__ . '/tests',
+                __DIR__ . '/vendor/oxid-esales/oxideshop-pe/Tests',
+                __DIR__ . '/vendor/oxid-esales/oxideshop-ee/Tests',
+            ]
+        );
+    UpdateToV7UnderscoredMethodsRector::setStorage($outputFile);
+
+    $services->set(
+        UpdateToV7UnderscoredMethodsRector::class
+    );
+};

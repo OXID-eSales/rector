@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * Copyright © OXID eSales AG. All rights reserved.
+ * See LICENSE file for license details.
+ */
+
+declare(strict_types=1);
+
+use Rector\Core\Configuration\Option;
+use Rector\OxidEsales\Update\MethodCallRenameGenerator;
+use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symplify\SymfonyPhpConfig\ValueObjectInliner;
+
+/**
+ * rector.php for updating renamed deprecated underscored methods' usages
+ * (e.g.
+ * protected function _executeNewAction($sNewAction) =>
+ * protected function executeNewAction($sNewAction)
+ * ) in OxidEsales modules.
+ */
+if (!defined('TEST_LIBRARY_PATH')) {
+    define('TEST_LIBRARY_PATH', __DIR__ . '/vendor/oxid-esales/testing-library/library/');
+}
+if (!defined('TEST_LIBRARY_HELPERS_PATH')) {
+    define('TEST_LIBRARY_HELPERS_PATH', TEST_LIBRARY_PATH . 'helpers/');
+}
+
+return static function (ContainerConfigurator $containerConfigurator): void {
+
+    $modulePath = __DIR__ . '/vendor/MODULE_VENDOR_PATH/';
+    $inputFile = __DIR__ . '/vendor/rector/rector/templates/oxidEsales/oxid_v7_deprecated_underscored_classes_methods.csv';
+
+    if (!is_file($inputFile)) {
+        throw new \Exception("Input file: $inputFile not found!");
+    }
+
+    $parameters = $containerConfigurator->parameters();
+    $services = $containerConfigurator->services();
+
+    $parameters
+        ->set(
+            Option::PATHS,
+            [
+                $modulePath,
+            ]
+        )
+        ->set(
+            Option::SKIP,
+            [
+                $modulePath . '/views',
+                $modulePath . '/translations',
+            ]
+        )
+        ->set(
+            Option::PHPSTAN_FOR_RECTOR_PATH,
+            __DIR__ . '/phpstan.neon'
+        );
+
+    $methodCallRenames = (new MethodCallRenameGenerator())->getMethodCallRenamesForModule($inputFile, $modulePath);
+
+    $services->set(RenameMethodRector::class)
+        ->call(
+            'configure',
+            [[
+                RenameMethodRector::METHOD_CALL_RENAMES => ValueObjectInliner::inline($methodCallRenames),
+            ]]
+        );
+};

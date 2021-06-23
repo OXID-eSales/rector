@@ -3874,6 +3874,9 @@ class ComposerStaticInitb578ab92a53243b19c8eaca080ce8de2
         'Symplify\\SymfonyPhpConfig\\ValueObjectInliner' => __DIR__ . '/..' . '/symplify/symfony-php-config/src/ValueObjectInliner.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+        /** OxideEsales */
+        'Rector\\OxidEsales\\Rector\\UpdateToV7UnderscoredMethodsRector' => __DIR__ . '/../..' . '/rules/OxidEsales/Rector/UpdateToV7UnderscoredMethodsRector.php',
+        'Rector\\OxidEsales\\Update\\MethodCallRenameGenerator' => __DIR__ . '/../..' . '/packages/OxidEsales/Update/MethodCallRenameGenerator.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

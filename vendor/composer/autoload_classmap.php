@@ -3519,4 +3519,7 @@ return array(
     'Symplify\\SymfonyPhpConfig\\ValueObjectInliner' => $vendorDir . '/symplify/symfony-php-config/src/ValueObjectInliner.php',
     'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
     'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+    /** OxideEsales */
+    'Rector\\OxidEsales\\Rector\\UpdateToV7UnderscoredMethodsRector' => $baseDir . '/rules/OxidEsales/Rector/UpdateToV7UnderscoredMethodsRector.php',
+    'Rector\\OxidEsales\\Update\\MethodCallRenameGenerator' => $baseDir . '/packages/OxidEsales/Update/MetodCallRenameGenerator.php',
 );
