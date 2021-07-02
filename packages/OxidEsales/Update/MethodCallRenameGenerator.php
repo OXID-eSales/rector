@@ -30,12 +30,11 @@ final class MethodCallRenameGenerator
         $this->setTemporaryFile($inputFile);
         $this->mergeModuleContentsToTemporaryFile($modulePath);
         $classMethodArray = array_map('str_getcsv', file($inputFile));
-        foreach ($classMethodArray as [$class, $oldMethod]) {
+        foreach ($classMethodArray as [$class, $oldMethod, $newMethod]) {
             $className = (new \ReflectionClass($class))->getShortName();
             if (!$this->temporaryFileContainsStrings($className, $oldMethod)) {
                 continue;
             }
-            $newMethod = ltrim($oldMethod, '_');
             $methodCallRenames[] = new MethodCallRename($class, $oldMethod, $newMethod);
         }
         $this->removeTemporaryFile();
