@@ -30,6 +30,7 @@ if (!defined('TEST_LIBRARY_HELPERS_PATH')) {
 return static function (ContainerConfigurator $containerConfigurator): void {
 
     $modulePath = __DIR__ . '/vendor/MODULE_VENDOR_PATH/';
+    $moduleMetadata = $modulePath . '/metadata.php';
     $inputFile = __DIR__ . '/vendor/rector/rector/templates/oxidEsales/oxid_v7_deprecated_underscored_classes_methods.csv';
 
     if (!is_file($inputFile)) {
@@ -49,14 +50,25 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->set(
             Option::SKIP,
             [
-                $modulePath . '/views',
+                $modulePath . '/assets',
+                $modulePath . '/migration',
+                $modulePath . '/Tests',
                 $modulePath . '/translations',
+                $modulePath . '/views',
             ]
-        )
-        ->set(
-            Option::PHPSTAN_FOR_RECTOR_PATH,
-            __DIR__ . '/phpstan.neon'
         );
+
+    /**
+     * Associate module's parent class with an alias, e.g.
+     * Module\Namespace\Order_parent - alias for Shop\Namespace\Order
+     * using $aModule['extend'] array from metadata.php
+     */
+    include $moduleMetadata;
+    foreach ($aModule['extend'] as $shopClass => $moduleClass) {
+        if (!class_exists("{$moduleClass}_parent")) {
+            class_alias($shopClass, "{$moduleClass}_parent");
+        }
+    }
 
     $methodCallRenames = (new MethodCallRenameGenerator())->getMethodCallRenamesForModule($inputFile, $modulePath);
 
